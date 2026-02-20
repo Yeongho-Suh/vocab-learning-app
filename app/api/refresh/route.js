@@ -1,9 +1,10 @@
-// POST /api/refresh - 새로운 단어 선택 (스케줄러 또는 수동 호출)
+// POST /api/refresh - 새로운 단어 선택 (수동 호출)
 import { selectNewWord } from '../../../lib/wordManager.js';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {
-    // 간단한 인증 (선택사항: 환경변수로 비밀키 설정 가능)
     const authHeader = request.headers.get('authorization');
     const secret = process.env.REFRESH_SECRET;
 
