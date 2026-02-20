@@ -26,6 +26,9 @@ yarn-error.log*
 .env*.local
 .env
 
+# Word state (local dev only)
+/data/word-state.json
+
 # Vercel
 .vercel
 
