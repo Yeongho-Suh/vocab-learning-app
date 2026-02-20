@@ -3,6 +3,48 @@
 import { useState, useEffect } from 'react';
 import './globals.css';
 
+/**
+ * 단어의 어근(stem)을 추출하여 예문에서 매칭되는 부분을 빨간색으로 하이라이트합니다.
+ * 예: "denounce" → "denouncing", "let off steam" → "letting off steam"
+ */
+function highlightWordInExample(wordText, exampleText) {
+  if (!wordText || !exampleText) return exampleText;
+
+  // 단어를 개별 단어로 분리하고, 3글자 이하 단어(of, a, the 등)는 제외
+  const words = wordText.trim().split(/\s+/).filter((w) => w.length > 3);
+
+  // 각 단어의 어근을 추출 (trailing 'e' 제거로 denounce→denounc 등 처리)
+  const stems = words.map((w) => {
+    const clean = w.replace(/[^a-zA-Z]/g, '').toLowerCase();
+    const stem = clean
+      .replace(/(ing|ed|es|er|est|ly|tion|sion|ment|ness|ful|less|ous|ive|able|ible)$/i, '')
+      .replace(/e$/, '');
+    return stem.length >= 3 ? stem : clean.slice(0, Math.min(4, clean.length));
+  });
+
+  // 어근이 없으면 원본 텍스트 그대로 반환
+  if (stems.length === 0) return exampleText;
+
+  // 어근 기반 정규식: 캡처 그룹으로 감싸서 split 시 매칭 부분도 배열에 포함
+  const patternStr = stems
+    .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[a-zA-Z]*')
+    .join('|');
+  const regex = new RegExp(`(\\b(?:${patternStr}))`, 'gi');
+
+  const parts = exampleText.split(regex);
+
+  return parts.map((part, i) => {
+    // 각 part가 어근과 매칭되는지 확인
+    const isMatch = stems.some((stem) =>
+      part.toLowerCase().startsWith(stem.toLowerCase())
+    );
+    if (isMatch) {
+      return <span key={i} className="highlight">{part}</span>;
+    }
+    return part;
+  });
+}
+
 export default function Home() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -112,7 +154,7 @@ export default function Home() {
         {word.example && (
           <div className="example-section">
             <div className="example-label">Example</div>
-            <p className="example-text">{word.example}</p>
+            <p className="example-text">{highlightWordInExample(word.word, word.example)}</p>
           </div>
         )}
       </div>
