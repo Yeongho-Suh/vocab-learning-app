@@ -1,178 +1,161 @@
-# Vercel 완전 가이드
+# Vercel 배포 가이드
 
-## 🚀 Vercel이란?
+## Vercel이란?
 
 Vercel은 **프론트엔드 및 풀스택 웹 애플리케이션을 위한 클라우드 플랫폼**입니다. Next.js를 만든 회사에서 운영하며, 배포와 호스팅을 극도로 간편하게 만들어줍니다.
 
 ---
 
-## ⭐ 주요 특징
+## 이 프로젝트의 배포 정보
 
-### ✅ 간편한 배포
-- Git 연동 (GitHub, GitLab, Bitbucket)
-- `git push`만 하면 자동 배포
-- CLI 도구로 로컬에서도 배포 가능
+| 항목 | 값 |
+|------|-----|
+| **프로덕션 URL** | https://my-daily-vocab.vercel.app |
+| **프로젝트명** | vocab-learning-app |
+| **팀/계정** | yeongho-suhs-projects |
+| **GitHub 연동** | Yeongho-Suh/vocab-learning-app |
+| **자동 배포** | GitHub push 시 자동 배포 |
 
-### ✅ 자동화
-- 커밋할 때마다 자동 빌드 & 배포
+### 환경 변수 (Vercel에 설정됨)
+| 변수명 | 용도 |
+|--------|------|
+| `NOTION_API_KEY` | Notion API 인증 키 |
+| `NOTION_DATABASE_ID` | Notion 데이터베이스 ID |
+
+---
+
+## 주요 특징
+
+### 간편한 배포
+- GitHub 연동으로 `git push`만 하면 자동 배포
+- CLI 도구로 로컬에서도 수동 배포 가능
+
+### 자동화
+- 커밋할 때마다 자동 빌드 및 배포
 - PR(Pull Request)마다 미리보기 URL 생성
-- 프로덕션/프리뷰 환경 자동 분리
 
-### ✅ 글로벌 CDN
+### 글로벌 CDN
 - 전 세계 엣지 네트워크에 자동 배포
-- 빠른 로딩 속도 (사용자 위치에서 가장 가까운 서버)
+- 사용자 위치에서 가장 가까운 서버에서 응답
 
-### ✅ Serverless Functions
-- API 엔드포인트를 쉽게 만들 수 있음
-- 자동 스케일링 (트래픽에 따라 자동 확장)
-- Node.js, Python, Go, Ruby 지원
+### Serverless Functions
+- API 엔드포인트를 자동으로 Serverless Function으로 변환
+- Next.js App Router의 `route.js` 파일이 자동 배포됨
+- `export const dynamic = 'force-dynamic'`으로 캐싱 비활성화
 
-### ✅ 무료 플랜
+### 무료 플랜
 - 개인 프로젝트에 충분한 무료 티어
 - 무제한 사이트 배포
 - 100GB 대역폭/월
-- Serverless Functions 실행 시간 제한 있음
+- Serverless Functions 실행 시간 10초 제한 (이 프로젝트에 충분)
 
 ---
 
-## 🎯 지원하는 프레임워크
+## 이 프로젝트에 Vercel이 적합한 이유
 
-- **Next.js** (최적화됨, Vercel이 만든 프레임워크)
-- React
-- Vue.js / Nuxt.js
-- Svelte / SvelteKit
-- Angular
-- Vanilla HTML/CSS/JS
-- Astro, Remix, Solid 등
+### Cron(스케줄러) 불필요
+이 프로젝트는 **별도 스케줄러 없이** 동작합니다:
+- 사용자가 접속할 때 KST 오전 6시 기준으로 날짜 판단
+- 오늘 선택된 단어가 없으면 자동으로 새 단어 선택
+- 이미 선택된 단어가 있으면 그대로 반환
+
+따라서 Vercel 무료 플랜으로 충분하며, Cron Jobs(유료)가 필요하지 않습니다.
+
+### 별도 DB 불필요
+- Notion 데이터베이스의 **ShownDate** 속성으로 상태 관리
+- 외부 DB(Supabase, PostgreSQL 등)를 사용하지 않음
+- Serverless 환경에서 로컬 파일 시스템을 사용하지 않음
 
 ---
 
-## 📦 배포 방법
+## 배포 방법
 
-### 방법 1: GitHub 연동 (가장 추천)
-```
-1. Vercel 회원가입 (vercel.com)
-2. GitHub 계정 연결
-3. 레포지토리 선택
-4. Import → 자동 배포 완료!
-```
+### 방법 1: GitHub 연동 (현재 설정)
+GitHub에 push하면 자동으로 배포됩니다.
 
-### 방법 2: CLI 사용
 ```bash
-# Vercel CLI 설치
-npm i -g vercel
+# 코드 수정 후
+git add .
+git commit -m "변경 내용"
+git push origin main
+# → Vercel에서 자동 빌드 및 배포
+```
 
-# 프로젝트 폴더에서 실행
-vercel
+### 방법 2: CLI 수동 배포
+GitHub 연동 없이 직접 배포할 때 사용합니다.
+
+```bash
+# Vercel CLI 로그인 (1회)
+npx vercel login
 
 # 프로덕션 배포
-vercel --prod
-```
-
-### 방법 3: 드래그 앤 드롭
-- 빌드된 폴더를 Vercel 웹사이트에 드래그
-
----
-
-## 💡 영어 단어 프로젝트에 Vercel이 적합한 이유
-
-### ✅ 장점
-1. **Next.js 최적화:** Next.js 사용 시 최고의 성능
-2. **무료 배포:** 개인 프로젝트는 비용 0원
-3. **자동 HTTPS:** SSL 인증서 자동 발급
-4. **환경 변수 관리:** Notion API 키 등을 안전하게 저장
-5. **Serverless Functions:** 백엔드 코드를 쉽게 배포
-6. **Cron Jobs (유료):** 스케줄링 작업 지원
-
-### ⚠️ 제약사항
-1. **Serverless 실행 시간 제한:**
-   - 무료: 10초
-   - Pro: 60초
-   - Enterprise: 900초
-
-2. **Cron Jobs는 유료 플랜만 가능**
-   - 매일 오전 6시 스케줄링이 필요한 프로젝트는 **문제가 될 수 있음**
-
-3. **데이터베이스 미포함:**
-   - 별도의 DB 서비스 연결 필요 (Vercel Postgres, Supabase 등)
-
----
-
-## 🔧 프로젝트 구현 방법
-
-### 옵션 A: Vercel + 외부 Cron 서비스 (무료)
-```
-프론트엔드: Vercel 배포
-백엔드 API: Vercel Serverless Functions
-스케줄링: GitHub Actions 또는 cron-job.org (무료)
-         → 매일 오전 6시에 Vercel API 호출
-```
-
-### 옵션 B: Vercel Pro ($20/월)
-```
-- Vercel Cron Jobs 사용
-- 모든 기능을 Vercel에서 해결
-```
-
-### 옵션 C: 다른 플랫폼 (무료)
-```
-- Railway, Render, Fly.io
-- Node.js 프로세스가 계속 실행되므로 node-cron 사용 가능
+npx vercel --prod --yes
 ```
 
 ---
 
-## 📂 Vercel 무료 플랜 사용 예시
+## Vercel 환경 변수 관리
 
-### 프로젝트 구조
+### CLI로 환경변수 추가
+```bash
+# 값을 파이프로 전달
+echo "값" | npx vercel env add 변수명 production
 ```
-my-vocab-app/
-├── pages/
-│   ├── index.js          # 메인 페이지
+
+### CLI로 환경변수 확인
+```bash
+npx vercel env ls
+```
+
+### 대시보드에서 관리
+Vercel 웹사이트 → 프로젝트 → Settings → Environment Variables
+
+---
+
+## 도메인 관리
+
+### 현재 도메인
+- **프로덕션**: https://my-daily-vocab.vercel.app
+- **기본 도메인**: https://vocab-learning-app-eight.vercel.app
+
+### 커스텀 도메인 추가 (선택사항)
+개인 도메인이 있으면 Vercel 대시보드에서 연결할 수 있습니다:
+1. Vercel 대시보드 → 프로젝트 → Settings → Domains
+2. 도메인 입력 → Add
+3. DNS 설정 안내에 따라 레코드 추가
+
+---
+
+## 프로젝트 구조 (Vercel 배포 기준)
+
+```
+vocab-learning-app/
+├── app/
+│   ├── page.js              # 메인 페이지 (Static)
+│   ├── layout.js            # 레이아웃
+│   ├── globals.css          # 스타일
 │   └── api/
-│       ├── word.js       # 오늘의 단어 가져오기
-│       └── refresh.js    # 단어 새로고침 (외부 cron이 호출)
+│       ├── word/route.js    # Serverless Function (Dynamic)
+│       └── refresh/route.js # Serverless Function (Dynamic)
 ├── lib/
-│   └── notion.js         # Notion API 로직
+│   ├── notion.js            # Notion API 모듈
+│   └── wordManager.js       # 단어 관리 로직
 └── package.json
 ```
 
-### 배포 과정
-1. GitHub에 코드 푸시
-2. Vercel에서 레포지토리 연결
-3. 환경 변수 설정 (NOTION_API_KEY, DATABASE_ID)
-4. 자동 배포 완료!
-5. `https://your-app.vercel.app` 접속 가능
+빌드 시 Next.js가 자동으로:
+- `app/page.js` → 정적 페이지로 빌드
+- `app/api/*/route.js` → Serverless Functions로 변환
 
 ---
 
-## 📊 대안 플랫폼 비교
+## 유용한 링크
 
-| 플랫폼 | 무료 티어 | Cron Job | 장점 |
-|--------|----------|----------|------|
-| **Vercel** | ✅ 풍부함 | ❌ 유료만 | Next.js 최적화, 빠른 배포 |
-| **Railway** | ✅ $5 크레딧 | ✅ 가능 | node-cron 사용 가능 |
-| **Render** | ✅ 제한적 | ✅ 가능 | 무료 Cron Jobs 지원 |
-| **Netlify** | ✅ 좋음 | ❌ 유료만 | Vercel과 유사 |
-| **Fly.io** | ✅ 제한적 | ✅ 가능 | 컨테이너 기반 |
-
----
-
-## 💡 추천 방법
-
-영어 단어 프로젝트는 **매일 오전 6시 스케줄링**이 필요하므로:
-
-### 무료로 구현
-- Vercel (프론트+API) + GitHub Actions (무료 Cron)
-- 또는 Render (모든 기능 무료로 가능)
-
-### 유료 괜찮다면
-- Vercel Pro ($20/월) - 가장 편리함
-
----
-
-## 🔗 유용한 링크
-
-- Vercel 공식 사이트: https://vercel.com
+- Vercel 대시보드: https://vercel.com/dashboard
 - Vercel 문서: https://vercel.com/docs
-- Next.js 문서: https://nextjs.org/docs
+- Next.js 배포 가이드: https://nextjs.org/docs/app/building-your-application/deploying
+
+---
+
+**작성일:** 2026-02-13
+**마지막 업데이트:** 2026-02-20
